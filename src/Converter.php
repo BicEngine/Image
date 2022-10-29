@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bic\Image;
 
-use Bic\Image\Exception\FormatException;
+use Bic\Image\Exception\CompressionException;
 
 final class Converter implements ConverterInterface
 {
@@ -13,6 +13,10 @@ final class Converter implements ConverterInterface
      */
     public function convert(ImageInterface $image, PixelFormatInterface $output): ImageInterface
     {
+        if ($image->getCompression() !== Compression::NONE) {
+            throw CompressionException::fromExpectedNonCompressed($image->getCompression());
+        }
+
         if ($image->getFormat() === $output) {
             return $image;
         }
@@ -24,7 +28,7 @@ final class Converter implements ConverterInterface
         $length = $image->getWidth() * $image->getHeight() * $shift;
 
         // Input raw (bytes) data payload
-        $idata  = $image->getContents();
+        $idata = $image->getContents();
 
         // Output raw (bytes) data payload
         $odata = '';
