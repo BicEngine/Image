@@ -16,6 +16,7 @@ enum Compression implements CompressionInterface
      */
     public function getName(): string
     {
+        /** @var non-empty-string */
         return $this->name;
     }
 }

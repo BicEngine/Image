@@ -20,7 +20,7 @@ final class Reader
      * @return non-empty-string
      * @throws \Throwable
      */
-    public static function topDown(TypedStream $stream, int $width, int $height, int $bytes): string
+    public static function topDown(StreamInterface $stream, int $width, int $height, int $bytes): string
     {
         $result = '';
 
@@ -28,6 +28,7 @@ final class Reader
             $result .= $line;
         }
 
+        /** @var non-empty-string */
         return $result;
     }
 
@@ -50,6 +51,7 @@ final class Reader
             $result = $line . $result;
         }
 
+        /** @var non-empty-string */
         return $result;
     }
 
@@ -61,8 +63,11 @@ final class Reader
      * @param positive-int $height Image height
      * @param positive-int $bytes Bytes count per line
      *
-     * @return iterable<non-empty-string>
+     * @return iterable<int, non-empty-string>
      * @throws \Throwable
+     *
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
      */
     public static function lines(StreamInterface $stream, int $width, int $height, int $bytes): iterable
     {

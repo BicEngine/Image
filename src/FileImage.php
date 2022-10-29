@@ -27,7 +27,7 @@ final class FileImage implements FileImageInterface
     /**
      * {@inheritDoc}
      */
-    public function getFormat(): PixelFormat
+    public function getFormat(): PixelFormatInterface
     {
         return $this->icon->getFormat();
     }
@@ -35,7 +35,7 @@ final class FileImage implements FileImageInterface
     /**
      * {@inheritDoc}
      */
-    public function getCompression(): Compression
+    public function getCompression(): CompressionInterface
     {
         return $this->icon->getCompression();
     }

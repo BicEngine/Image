@@ -26,19 +26,25 @@ enum PixelFormat implements PixelFormatInterface
 
     /**
      * @return Info
+     *
+     * @psalm-suppress all - psalm bug
      */
     private function getInfo(): Info
     {
+        /** @var \WeakMap<PixelFormat, Info>|null $attributes */
         static $attributes = null;
+
         $attributes ??= new \WeakMap();
 
         if (!isset($attributes[$this])) {
             $reflection = new \ReflectionEnumUnitCase($this, $this->name);
+
             foreach ($reflection->getAttributes(Info::class) as $attribute) {
                 return $attributes[$this] = $attribute->newInstance();
             }
         }
 
+        /** @psalm-var Info */
         return $attributes[$this] ??= new Info();
     }
 
@@ -54,6 +60,9 @@ enum PixelFormat implements PixelFormatInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
      */
     public function toRGBA(string $data, int $offset = 0): string
     {
@@ -84,6 +93,9 @@ enum PixelFormat implements PixelFormatInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
      */
     public function fromRGBA(string $data, int $offset = 0): string
     {

@@ -30,7 +30,11 @@ final class Converter implements ConverterInterface
         // Input raw (bytes) data payload
         $idata = $image->getContents();
 
-        // Output raw (bytes) data payload
+        /**
+         * Output raw (bytes) data payload
+         *
+         * @var non-empty-string $odata
+         */
         $odata = '';
 
         for ($offset = 0; $offset < $length; $offset += $shift) {

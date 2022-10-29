@@ -12,12 +12,12 @@ final class Image implements ImageInterface
      * @param non-empty-string $contents
      */
     public function __construct(
-        protected readonly PixelFormat $format,
+        protected readonly PixelFormatInterface $format,
         protected readonly int $width,
         protected readonly int $height,
         protected readonly string $contents,
-        protected readonly Compression $compression = Compression::NONE,
-        protected readonly object $metadata = new \StdClass(),
+        protected readonly CompressionInterface $compression = Compression::NONE,
+        protected readonly object $metadata = new \stdClass(),
     ) {
     }
 
@@ -32,7 +32,7 @@ final class Image implements ImageInterface
     /**
      * {@inheritDoc}
      */
-    public function getFormat(): PixelFormat
+    public function getFormat(): PixelFormatInterface
     {
         return $this->format;
     }
@@ -40,7 +40,7 @@ final class Image implements ImageInterface
     /**
      * {@inheritDoc}
      */
-    public function getCompression(): Compression
+    public function getCompression(): CompressionInterface
     {
         return $this->compression;
     }
