@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bic\Image;
 
 use Bic\Binary\FileStream;
+use Bic\Image\Exception\FormatException;
 use Bic\Image\Exception\ImageException;
 
 class Factory implements FactoryInterface
@@ -51,6 +52,6 @@ class Factory implements FactoryInterface
             }
         }
 
-        throw new ImageException('Unsupported image format');
+        throw new FormatException('Unsupported image format');
     }
 }
