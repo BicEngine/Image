@@ -8,9 +8,9 @@ interface ConverterInterface
 {
     /**
      * @param ImageInterface $image
-     * @param PixelFormat $output
+     * @param PixelFormatInterface $output
      *
      * @return ImageInterface
      */
-    public function convert(ImageInterface $image, PixelFormat $output): ImageInterface;
+    public function convert(ImageInterface $image, PixelFormatInterface $output): ImageInterface;
 }

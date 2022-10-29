@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Bic\Image;
 
+use Bic\Image\Exception\FormatException;
 use Bic\Image\Format\Info;
 
-enum PixelFormat
+enum PixelFormat implements PixelFormatInterface
 {
     #[Info(size: 3)]
     case R8G8B8;
@@ -42,14 +43,70 @@ enum PixelFormat
     }
 
     /**
-     * The number of significant bytes in a pixel value.
-     *
-     * @return positive-int
+     * {@inheritDoc}
      */
     public function getBytesPerPixel(): int
     {
         $info = $this->getInfo();
 
         return $info->size;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function toRGBA(string $data, int $offset = 0): string
+    {
+        return match ($this) {
+            PixelFormat::R8G8B8   => ($data[$offset] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00")
+                . "\x00",
+            PixelFormat::B8G8R8   => ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00")
+                . "\x00",
+            PixelFormat::R8G8B8A8 => ($data[$offset] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 3] ?? "\x00"),
+            PixelFormat::B8G8R8A8 => ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00")
+                . ($data[$offset + 3] ?? "\x00"),
+            PixelFormat::A8B8G8R8 => ($data[$offset + 3] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00"),
+            default => throw new FormatException('Unsupported input format ' . $this->name),
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function fromRGBA(string $data, int $offset = 0): string
+    {
+        return match ($this) {
+            PixelFormat::R8G8B8   => ($data[$offset] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00"),
+            PixelFormat::B8G8R8   => ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00"),
+            PixelFormat::R8G8B8A8 => ($data[$offset] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00") .
+                ($data[$offset + 3] ?? "\x00"),
+            PixelFormat::B8G8R8A8 => ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00")
+                . ($data[$offset + 3] ?? "\x00"),
+            PixelFormat::A8B8G8R8 => ($data[$offset + 3] ?? "\x00")
+                . ($data[$offset + 2] ?? "\x00")
+                . ($data[$offset + 1] ?? "\x00")
+                . ($data[$offset] ?? "\x00"),
+            default => throw new FormatException('Unsupported input format ' . $this->name),
+        };
     }
 }

@@ -16,16 +16,16 @@ interface ImageInterface
     /**
      * Returns image's pixel format.
      *
-     * @return PixelFormat
+     * @return PixelFormatInterface
      */
-    public function getFormat(): PixelFormat;
+    public function getFormat(): PixelFormatInterface;
 
     /**
      * Returns image compression.
      *
-     * @return Compression
+     * @return CompressionInterface
      */
-    public function getCompression(): Compression;
+    public function getCompression(): CompressionInterface;
 
     /**
      * Returns image width (in pixels).
