@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bic\Image;
 
+use Bic\Image\Exception\FormatException;
+
 final class Converter implements ConverterInterface
 {
     /**
@@ -35,7 +37,7 @@ final class Converter implements ConverterInterface
                 Format::R8G8B8A8 => $idata[$offset] . $idata[$offset + 1] . $idata[$offset + 2] . $idata[$offset + 3],
                 Format::B8G8R8A8 => $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset] . $idata[$offset + 3],
                 Format::A8B8G8R8 => $idata[$offset + 3] . $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset],
-                default => throw new \LogicException('Unsupported input ' . $input->name),
+                default => throw new FormatException('Unsupported input format ' . $input->name),
             };
 
             // RGBA to output input
@@ -43,7 +45,7 @@ final class Converter implements ConverterInterface
                 Format::R8G8B8 => $pixel[0] . $pixel[1] . $pixel[2],
                 Format::B8G8R8 => $pixel[2] . $pixel[1] . $pixel[0],
                 Format::R8G8B8A8 => $pixel,
-                Format::B8G8R8A8 => $pixel[0] . $pixel[1] . $pixel[2] . $pixel[3],
+                Format::B8G8R8A8 => $pixel[2] . $pixel[1] . $pixel[0] . $pixel[3],
                 Format::A8B8G8R8 => $pixel[3] . $pixel[2] . $pixel[1] . $pixel[0],
             };
         }
