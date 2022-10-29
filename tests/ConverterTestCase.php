@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Bic\Image\Tests;
 
-use Bic\Image\Format;
+use Bic\Image\PixelFormat;
 use Bic\Image\Image;
 
 class ConverterTestCase extends TestCase
 {
     public function setUp(): void
     {
-        foreach (Format::cases() as $format) {
+        foreach (PixelFormat::cases() as $format) {
             $pixel = match ($format) {
-                Format::R8G8B8   => 'RGB',
-                Format::B8G8R8   => 'BGR',
-                Format::R8G8B8A8 => 'RGBA',
-                Format::B8G8R8A8 => 'BGRA',
-                Format::A8B8G8R8 => 'ABGR',
+                PixelFormat::R8G8B8   => 'RGB',
+                PixelFormat::B8G8R8   => 'BGR',
+                PixelFormat::R8G8B8A8 => 'RGBA',
+                PixelFormat::B8G8R8A8 => 'BGRA',
+                PixelFormat::A8B8G8R8 => 'ABGR',
             };
 
             if (!\is_file($pathname = $this->pathname($format))) {
@@ -28,7 +28,7 @@ class ConverterTestCase extends TestCase
         parent::setUp();
     }
 
-    private function read(Format $format): string
+    private function read(PixelFormat $format): string
     {
         $pathname = $this->pathname($format);
 
@@ -39,7 +39,7 @@ class ConverterTestCase extends TestCase
         return '';
     }
 
-    private function pathname(Format $format): string
+    private function pathname(PixelFormat $format): string
     {
         return __DIR__ . '/stubs/' . $format->name . '.bin';
     }
@@ -48,7 +48,7 @@ class ConverterTestCase extends TestCase
     {
         $result = [];
 
-        foreach (Format::cases() as $format) {
+        foreach (PixelFormat::cases() as $format) {
             $result[$format->name] = [$format];
         }
 
@@ -58,11 +58,11 @@ class ConverterTestCase extends TestCase
     /**
      * @dataProvider formatsDataProvider
      */
-    public function testConversion(Format $inputFormat): void
+    public function testConversion(PixelFormat $inputFormat): void
     {
         $input = new Image($inputFormat, 10, 10, $this->read($inputFormat));
 
-        foreach (Format::cases() as $outputFormat) {
+        foreach (PixelFormat::cases() as $outputFormat) {
             $output = $this->converter->convert($input, $outputFormat);
 
             $expected = $this->read($outputFormat);

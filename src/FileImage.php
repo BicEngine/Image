@@ -19,9 +19,25 @@ final class FileImage implements FileImageInterface
     /**
      * {@inheritDoc}
      */
-    public function getFormat(): Format
+    public function getMetadata(): object
+    {
+        return $this->icon->getMetadata();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFormat(): PixelFormat
     {
         return $this->icon->getFormat();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCompression(): Compression
+    {
+        return $this->icon->getCompression();
     }
 
     /**

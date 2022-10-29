@@ -11,7 +11,7 @@ final class Converter implements ConverterInterface
     /**
      * {@inheritDoc}
      */
-    public function convert(ImageInterface $image, Format $output): ImageInterface
+    public function convert(ImageInterface $image, PixelFormat $output): ImageInterface
     {
         if ($image->getFormat() === $output) {
             return $image;
@@ -32,24 +32,31 @@ final class Converter implements ConverterInterface
         for ($offset = 0; $offset < $length; $offset += $shift) {
             // Pixel in RGBA input
             $pixel = match ($input) {
-                Format::R8G8B8 => $idata[$offset] . $idata[$offset + 1] . $idata[$offset + 2] . "\x00",
-                Format::B8G8R8 => $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset] . "\x00",
-                Format::R8G8B8A8 => $idata[$offset] . $idata[$offset + 1] . $idata[$offset + 2] . $idata[$offset + 3],
-                Format::B8G8R8A8 => $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset] . $idata[$offset + 3],
-                Format::A8B8G8R8 => $idata[$offset + 3] . $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset],
+                PixelFormat::R8G8B8 => $idata[$offset] . $idata[$offset + 1] . $idata[$offset + 2] . "\x00",
+                PixelFormat::B8G8R8 => $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset] . "\x00",
+                PixelFormat::R8G8B8A8 => $idata[$offset] . $idata[$offset + 1] . $idata[$offset + 2] . $idata[$offset + 3],
+                PixelFormat::B8G8R8A8 => $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset] . $idata[$offset + 3],
+                PixelFormat::A8B8G8R8 => $idata[$offset + 3] . $idata[$offset + 2] . $idata[$offset + 1] . $idata[$offset],
                 default => throw new FormatException('Unsupported input format ' . $input->name),
             };
 
             // RGBA to output input
             $odata .= match ($output) {
-                Format::R8G8B8 => $pixel[0] . $pixel[1] . $pixel[2],
-                Format::B8G8R8 => $pixel[2] . $pixel[1] . $pixel[0],
-                Format::R8G8B8A8 => $pixel,
-                Format::B8G8R8A8 => $pixel[2] . $pixel[1] . $pixel[0] . $pixel[3],
-                Format::A8B8G8R8 => $pixel[3] . $pixel[2] . $pixel[1] . $pixel[0],
+                PixelFormat::R8G8B8 => $pixel[0] . $pixel[1] . $pixel[2],
+                PixelFormat::B8G8R8 => $pixel[2] . $pixel[1] . $pixel[0],
+                PixelFormat::R8G8B8A8 => $pixel,
+                PixelFormat::B8G8R8A8 => $pixel[2] . $pixel[1] . $pixel[0] . $pixel[3],
+                PixelFormat::A8B8G8R8 => $pixel[3] . $pixel[2] . $pixel[1] . $pixel[0],
             };
         }
 
-        return new Image($output, $image->getWidth(), $image->getHeight(), $odata);
+        return new Image(
+            format: $output,
+            width: $image->getWidth(),
+            height: $image->getHeight(),
+            contents: $odata,
+            compression: $image->getCompression(),
+            metadata: $image->getMetadata(),
+        );
     }
 }

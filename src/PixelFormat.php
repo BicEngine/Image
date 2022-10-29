@@ -6,7 +6,7 @@ namespace Bic\Image;
 
 use Bic\Image\Format\Info;
 
-enum Format
+enum PixelFormat
 {
     #[Info(size: 3)]
     case R8G8B8;
