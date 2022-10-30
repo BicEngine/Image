@@ -7,6 +7,11 @@ namespace Bic\Image;
 final class Image implements ImageInterface
 {
     /**
+     * @var positive-int|0|null
+     */
+    private ?int $bytes = null;
+
+    /**
      * @param positive-int $width
      * @param positive-int $height
      * @param non-empty-string $contents
@@ -74,6 +79,13 @@ final class Image implements ImageInterface
      */
     public function getBytes(): int
     {
-        return $this->width * $this->height * $this->format->getBytesPerPixel();
+        if ($this->bytes !== null) {
+            return $this->bytes;
+        }
+
+        return $this->bytes = ($this->compression === Compression::NONE
+            ? $this->width * $this->height * $this->format->getBytesPerPixel()
+            : \strlen($this->contents)
+        );
     }
 }
