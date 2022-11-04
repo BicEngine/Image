@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bic\Image;
 
 use Bic\Binary\StreamInterface;
-use Bic\Binary\TypedStream;
 
 final class Reader
 {
