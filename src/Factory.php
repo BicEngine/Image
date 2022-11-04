@@ -6,7 +6,6 @@ namespace Bic\Image;
 
 use Bic\Binary\FileStream;
 use Bic\Image\Exception\FormatException;
-use Bic\Image\Exception\ImageException;
 
 class Factory implements FactoryInterface
 {
