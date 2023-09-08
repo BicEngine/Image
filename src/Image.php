@@ -7,85 +7,65 @@ namespace Bic\Image;
 final class Image implements ImageInterface
 {
     /**
-     * @var positive-int|0|null
+     * @var int<0, max>|null
      */
     private ?int $bytes = null;
 
     /**
-     * @param positive-int $width
-     * @param positive-int $height
+     * @param int<1, max> $width
+     * @param int<1, max> $height
      * @param non-empty-string $contents
      */
     public function __construct(
-        protected readonly PixelFormatInterface $format,
-        protected readonly int $width,
-        protected readonly int $height,
-        protected readonly string $contents,
-        protected readonly CompressionInterface $compression = Compression::NONE,
-        protected readonly object $metadata = new \stdClass(),
+        private readonly PixelFormatInterface $format,
+        private readonly int $width,
+        private readonly int $height,
+        private readonly string $contents,
+        private readonly CompressionInterface $compression = Compression::NONE,
+        private readonly ?object $metadata = null,
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getMetadata(): object
     {
         return $this->metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getFormat(): PixelFormatInterface
     {
         return $this->format;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getCompression(): CompressionInterface
     {
         return $this->compression;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getWidth(): int
     {
         return $this->width;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getHeight(): int
     {
         return $this->height;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getContents(): string
     {
         return $this->contents;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getBytes(): int
     {
         if ($this->bytes !== null) {
             return $this->bytes;
         }
 
-        return $this->bytes = ($this->compression === Compression::NONE
-            ? $this->width * $this->height * $this->format->getBytesPerPixel()
-            : \strlen($this->contents)
-        );
+        if ($this->compression === Compression::NONE) {
+            return $this->bytes = $this->width * $this->height * $this->format->getBytesPerPixel();
+        }
+
+        return $this->bytes = \strlen($this->contents);
     }
 }

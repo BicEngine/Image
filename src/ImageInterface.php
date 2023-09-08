@@ -9,35 +9,31 @@ interface ImageInterface
     /**
      * Returns additional image metadata.
      *
-     * @return object
+     * @return object|null
      */
-    public function getMetadata(): object;
+    public function getMetadata(): ?object;
 
     /**
      * Returns image's pixel format.
-     *
-     * @return PixelFormatInterface
      */
     public function getFormat(): PixelFormatInterface;
 
     /**
      * Returns image compression.
-     *
-     * @return CompressionInterface
      */
     public function getCompression(): CompressionInterface;
 
     /**
      * Returns image width (in pixels).
      *
-     * @psalm-return positive-int
+     * @return int<1, max>
      */
     public function getWidth(): int;
 
     /**
      * Returns image height (in pixels).
      *
-     * @psalm-return positive-int
+     * @return int<1, max>
      */
     public function getHeight(): int;
 
@@ -51,7 +47,7 @@ interface ImageInterface
     /**
      * Returns size in bytes.
      *
-     * @return positive-int
+     * @return int<1, max>
      */
     public function getBytes(): int;
 }

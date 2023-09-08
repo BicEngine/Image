@@ -11,9 +11,6 @@ enum Compression implements CompressionInterface
      */
     case NONE;
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName(): string
     {
         /** @var non-empty-string */

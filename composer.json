@@ -3,8 +3,7 @@
     "description": "The library for reading, converting and decoding images",
     "license": "MIT",
     "require": {
-        "php": "^8.1",
-        "bic-engine/binary": "^1.0"
+        "php": "^8.1"
     },
     "autoload": {
         "psr-4": {
@@ -12,9 +11,8 @@
         }
     },
     "require-dev": {
-        "vimeo/psalm": "^4.28",
-        "phpunit/phpunit": "^9.5",
-        "squizlabs/php_codesniffer": "^3.7"
+        "phpunit/phpunit": "^10.3",
+        "vimeo/psalm": "^5.15"
     },
     "autoload-dev": {
         "psr-4": {
@@ -23,14 +21,18 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev",
-            "dev-main": "1.0.x-dev"
+            "dev-main": "1.0.x-dev",
+            "dev-master": "1.0.x-dev"
         }
     },
     "config": {
         "sort-packages": true,
         "platform-check": true,
-        "optimize-autoloader": true
+        "bin-compat": "full",
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

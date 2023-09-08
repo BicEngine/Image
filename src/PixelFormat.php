@@ -4,121 +4,149 @@ declare(strict_types=1);
 
 namespace Bic\Image;
 
-use Bic\Image\Exception\FormatException;
-use Bic\Image\Format\Info;
+use Bic\Image\PixelFormat\ColorInfo;
+use Bic\Image\PixelFormat\Info;
 
 enum PixelFormat implements PixelFormatInterface
 {
-    #[Info(size: 3)]
+    #[Info(
+        bytes: 3,
+        red:   new ColorInfo(0b11111111_00000000_00000000_00000000),
+        green: new ColorInfo(0b00000000_11111111_00000000_00000000),
+        blue:  new ColorInfo(0b00000000_00000000_11111111_00000000),
+    )]
     case R8G8B8;
 
-    #[Info(size: 3)]
+    #[Info(
+        bytes: 3,
+        red:   new ColorInfo(0b00000000_00000000_11111111_00000000),
+        green: new ColorInfo(0b00000000_11111111_00000000_00000000),
+        blue:  new ColorInfo(0b11111111_00000000_00000000_00000000),
+    )]
     case B8G8R8;
 
-    #[Info(size: 4)]
+    #[Info(
+        bytes: 4,
+        red:   new ColorInfo(0b11111111_00000000_00000000_00000000),
+        green: new ColorInfo(0b00000000_11111111_00000000_00000000),
+        blue:  new ColorInfo(0b00000000_00000000_11111111_00000000),
+        alpha: new ColorInfo(0b00000000_00000000_00000000_11111111),
+    )]
     case R8G8B8A8;
 
-    #[Info(size: 4)]
+    #[Info(
+        bytes: 4,
+        red:   new ColorInfo(0b00000000_00000000_11111111_00000000),
+        green: new ColorInfo(0b00000000_11111111_00000000_00000000),
+        blue:  new ColorInfo(0b11111111_00000000_00000000_00000000),
+        alpha: new ColorInfo(0b00000000_00000000_00000000_11111111),
+    )]
     case B8G8R8A8;
 
-    #[Info(size: 4)]
+    #[Info(
+        bytes: 4,
+        red:   new ColorInfo(0b00000000_00000000_00000000_11111111),
+        green: new ColorInfo(0b00000000_00000000_11111111_00000000),
+        blue:  new ColorInfo(0b00000000_11111111_00000000_00000000),
+        alpha: new ColorInfo(0b11111111_00000000_00000000_00000000),
+    )]
     case A8B8G8R8;
 
-    /**
-     * @return Info
-     *
-     * @psalm-suppress all - psalm bug
-     */
     private function getInfo(): Info
     {
-        /** @var \WeakMap<PixelFormat, Info>|null $attributes */
-        static $attributes = null;
+        /**
+         * Local identity map for Info metadata objects.
+         *
+         * @var array<non-empty-string, Info> $memory
+         */
+        static $memory = [];
 
-        $attributes ??= new \WeakMap();
-
-        if (!isset($attributes[$this])) {
-            $reflection = new \ReflectionEnumUnitCase($this, $this->name);
-
-            foreach ($reflection->getAttributes(Info::class) as $attribute) {
-                return $attributes[$this] = $attribute->newInstance();
-            }
+        if (isset($memory[$this->name])) {
+            return $memory[$this->name];
         }
 
-        /** @psalm-var Info */
-        return $attributes[$this] ??= new Info();
+        $attributes = (new \ReflectionEnumUnitCase(self::class, $this->name))
+            ->getAttributes(Info::class)
+        ;
+
+        if (isset($attributes[0])) {
+            return $memory[$this->name] = $attributes[0]->newInstance();
+        }
+
+        throw new \LogicException('Could not load pixel format [' . $this->name . '] info');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getBytesPerPixel(): int
     {
         $info = $this->getInfo();
 
-        return $info->size;
+        return $info->bytes;
     }
 
     /**
-     * {@inheritDoc}
+     * @param int<0, max> $mask
      *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
+     * @return int<0, max>
      */
-    public function toRGBA(string $data, int $offset = 0): string
+    public static function getOffsetByMask(int $mask): int
     {
-        return match ($this) {
-            PixelFormat::R8G8B8   => ($data[$offset] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00")
-                . "\x00",
-            PixelFormat::B8G8R8   => ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00")
-                . "\x00",
-            PixelFormat::R8G8B8A8 => ($data[$offset] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 3] ?? "\x00"),
-            PixelFormat::B8G8R8A8 => ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00")
-                . ($data[$offset + 3] ?? "\x00"),
-            PixelFormat::A8B8G8R8 => ($data[$offset + 3] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00"),
-            default => throw new FormatException('Unsupported input format ' . $this->name),
-        };
+        if ($mask === 0) {
+            return 0;
+        }
+
+        $offset = 0;
+
+        for (; !($mask & 0x01); $mask >>= 1) {
+            ++$offset;
+        }
+
+        return $offset;
     }
 
     /**
-     * {@inheritDoc}
+     * @param int<0, max> $mask
      *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
+     * @return int<0, max>
      */
-    public function fromRGBA(string $data, int $offset = 0): string
+    public static function getLossByMask(int $mask): int
     {
-        return match ($this) {
-            PixelFormat::R8G8B8   => ($data[$offset] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00"),
-            PixelFormat::B8G8R8   => ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00"),
-            PixelFormat::R8G8B8A8 => ($data[$offset] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00") .
-                ($data[$offset + 3] ?? "\x00"),
-            PixelFormat::B8G8R8A8 => ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00")
-                . ($data[$offset + 3] ?? "\x00"),
-            PixelFormat::A8B8G8R8 => ($data[$offset + 3] ?? "\x00")
-                . ($data[$offset + 2] ?? "\x00")
-                . ($data[$offset + 1] ?? "\x00")
-                . ($data[$offset] ?? "\x00"),
-            default => throw new FormatException('Unsupported input format ' . $this->name),
-        };
+        if ($mask === 0) {
+            return 0;
+        }
+
+        $loss = 0;
+        for (; ($mask & 0x01); $mask >>= 1) {
+            ++$loss;
+        }
+
+        return $loss;
+    }
+
+    public function getRedColor(): ColorInfo
+    {
+        $info = $this->getInfo();
+
+        return $info->red;
+    }
+
+    public function getGreenColor(): ColorInfo
+    {
+        $info = $this->getInfo();
+
+        return $info->green;
+    }
+
+    public function getBlueColor(): ColorInfo
+    {
+        $info = $this->getInfo();
+
+        return $info->blue;
+    }
+
+    public function getAlphaColor(): ColorInfo
+    {
+        $info = $this->getInfo();
+
+        return $info->alpha;
     }
 }
