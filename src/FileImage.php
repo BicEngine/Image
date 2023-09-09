@@ -41,9 +41,9 @@ final class FileImage implements FileImageInterface
         return $this->image->getHeight();
     }
 
-    public function getContents(): string
+    public function getData(): string
     {
-        return $this->image->getContents();
+        return $this->image->getData();
     }
 
     public function getBytes(): int

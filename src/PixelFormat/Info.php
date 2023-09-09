@@ -9,7 +9,7 @@ namespace Bic\Image\PixelFormat;
  * @psalm-internal Bic\Image
  */
 #[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
-final class Info
+class Info
 {
     /**
      * @param int<1, max> $bytes

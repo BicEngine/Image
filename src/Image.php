@@ -7,26 +7,26 @@ namespace Bic\Image;
 final class Image implements ImageInterface
 {
     /**
-     * @var int<0, max>|null
+     * @var int<1, max>|null
      */
     private ?int $bytes = null;
 
     /**
      * @param int<1, max> $width
      * @param int<1, max> $height
-     * @param non-empty-string $contents
+     * @param non-empty-string $data
      */
     public function __construct(
         private readonly PixelFormatInterface $format,
         private readonly int $width,
         private readonly int $height,
-        private readonly string $contents,
+        private readonly string $data,
         private readonly CompressionInterface $compression = Compression::NONE,
         private readonly ?object $metadata = null,
     ) {
     }
 
-    public function getMetadata(): object
+    public function getMetadata(): ?object
     {
         return $this->metadata;
     }
@@ -51,9 +51,9 @@ final class Image implements ImageInterface
         return $this->height;
     }
 
-    public function getContents(): string
+    public function getData(): string
     {
-        return $this->contents;
+        return $this->data;
     }
 
     public function getBytes(): int
@@ -66,6 +66,6 @@ final class Image implements ImageInterface
             return $this->bytes = $this->width * $this->height * $this->format->getBytesPerPixel();
         }
 
-        return $this->bytes = \strlen($this->contents);
+        return $this->bytes = \strlen($this->data);
     }
 }

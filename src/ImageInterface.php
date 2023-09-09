@@ -42,7 +42,7 @@ interface ImageInterface
      *
      * @return non-empty-string
      */
-    public function getContents(): string;
+    public function getData(): string;
 
     /**
      * Returns size in bytes.
